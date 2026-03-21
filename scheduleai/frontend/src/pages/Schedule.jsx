@@ -19,7 +19,7 @@ export default function Schedule() {
 
   if (loading && !schedule) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#0c0e16]">
+      <div className="min-h-screen flex items-center justify-center bg-[#eef0f9] dark:bg-[#0c0e16]">
         <div className="w-8 h-8 border-4 border-[#6366f1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -27,7 +27,7 @@ export default function Schedule() {
 
   if (!schedule) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16] flex flex-col items-center justify-center px-5 pb-24">
+      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex flex-col items-center justify-center px-5 pb-24">
         <div className="w-16 h-16 bg-[#eef2ff] dark:bg-[#1e2040] rounded-2xl flex items-center justify-center mb-5">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -50,7 +50,7 @@ export default function Schedule() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-5 pt-8 pb-28">
 
         {/* Header */}
@@ -84,10 +84,13 @@ export default function Schedule() {
             return (
               <div
                 key={day.id}
+                onClick={() => stepCount > 0 && navigate(`/session/${day.id}`)}
                 className={`bg-white dark:bg-[#131720] rounded-2xl border shadow-sm overflow-hidden transition-all ${
+                  stepCount > 0 ? 'cursor-pointer active:scale-[0.99]' : ''
+                } ${
                   isToday
                     ? 'border-[#6366f1] shadow-md'
-                    : 'border-[#e2e8f4] dark:border-[#1e2235]'
+                    : 'border-[#dde1ef] dark:border-[#1e2235]'
                 }`}
               >
                 <div className="p-4">
@@ -114,14 +117,14 @@ export default function Schedule() {
                       </p>
                     </div>
                     <button
-                      onClick={() => navigate(`/session/${day.id}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/session/${day.id}`); }}
                       disabled={stepCount === 0}
                       className={`flex-shrink-0 w-full max-w-[120px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all ${
                         stepCount === 0
                           ? 'bg-[#f1f5f9] dark:bg-[#1e2235] text-[#94a3b8] cursor-not-allowed'
                           : isToday
                           ? 'bg-[#6366f1] hover:bg-[#4f46e5] text-white shadow-sm'
-                          : 'bg-[#f1f5f9] dark:bg-[#1e2235] text-[#64748b] dark:text-[#94a3b8] hover:bg-[#eef2ff] dark:hover:bg-[#1e2040] hover:text-[#6366f1] dark:hover:text-[#818cf8]'
+                          : 'bg-[#eef2ff] dark:bg-[#1e2040] text-[#6366f1] dark:text-[#818cf8] hover:bg-[#6366f1] hover:text-white dark:hover:bg-[#6366f1] dark:hover:text-white'
                       }`}
                     >
                       {stepCount === 0 ? 'Empty' : (
@@ -155,7 +158,7 @@ export default function Schedule() {
           </button>
           <button
             onClick={() => navigate('/schedule/new')}
-            className="w-full py-3.5 px-6 bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:border-[#6366f1] dark:hover:border-[#6366f1] active:scale-[0.98] transition-all"
+            className="w-full py-3.5 px-6 bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:border-[#6366f1] dark:hover:border-[#6366f1] active:scale-[0.98] transition-all"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"/>

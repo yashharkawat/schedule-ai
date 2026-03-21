@@ -184,7 +184,7 @@ export default function Session() {
   }, []);
 
   if (!day || !step) return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16] flex items-center justify-center">
+    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex items-center justify-center">
       <p className="text-[#64748b] dark:text-[#94a3b8]">Loading...</p>
     </div>
   );
@@ -193,7 +193,7 @@ export default function Session() {
   if (showDone) {
     const total = day.steps.reduce((a, s) => a + s.durationMinutes, 0);
     return (
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16] flex flex-col">
+      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex flex-col">
         <div className="max-w-lg mx-auto w-full px-4 pt-16 pb-8 flex flex-col items-center text-center flex-1">
           {/* Indigo checkmark circle */}
           <div className="w-20 h-20 bg-[#6366f1] rounded-full flex items-center justify-center mb-6 shadow-lg">
@@ -204,7 +204,7 @@ export default function Session() {
           <h2 className="text-2xl font-bold text-[#0f172a] dark:text-[#f1f5f9] mb-2">Session complete</h2>
           <p className="text-[#64748b] dark:text-[#94a3b8] mb-8">{day.name} — {total} minutes. Well done.</p>
           <textarea
-            className="w-full border border-[#e2e8f4] dark:border-[#1e2235] rounded-xl px-4 py-3 text-sm mb-5 bg-white dark:bg-[#131720] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] resize-none focus:outline-none focus:border-[#6366f1]"
+            className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-3 text-sm mb-5 bg-white dark:bg-[#131720] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] resize-none focus:outline-none focus:border-[#6366f1]"
             rows={3}
             placeholder="Add a note (optional)"
             value={doneNote}
@@ -226,7 +226,7 @@ export default function Session() {
   if (session.isResting) {
     const nextStep = day.steps[session.currentStepIndex + 1];
     return (
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16]">
+      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
         <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
           <div className="flex items-center gap-3 mb-6">
             <button
@@ -241,11 +241,11 @@ export default function Session() {
             <div className="flex-1 text-center text-sm text-[#64748b] dark:text-[#94a3b8]">{day.name}</div>
           </div>
 
-          <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#e2e8f4] dark:border-[#1e2235] p-8 text-center">
+          <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] p-8 text-center">
             <p className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider mb-3">Rest</p>
             <div className="text-6xl font-bold text-[#6366f1] mb-4">{session.restTimeLeft}s</div>
             {nextStep && (
-              <div className="bg-[#f8fafc] dark:bg-[#0c0e16] rounded-xl px-4 py-3 mb-6">
+              <div className="bg-[#eef0f9] dark:bg-[#0c0e16] rounded-xl px-4 py-3 mb-6">
                 <p className="text-xs text-[#64748b] dark:text-[#94a3b8] mb-1">Up next</p>
                 <p className="text-sm font-semibold text-[#0f172a] dark:text-[#f1f5f9]">{nextStep.title || `Exercise ${session.currentStepIndex + 2}`}</p>
                 <p className="text-xs text-[#64748b] dark:text-[#94a3b8] mt-0.5">{nextStep.durationMinutes} min</p>
@@ -267,7 +267,7 @@ export default function Session() {
   const progressPct = (session.currentStepIndex / day.steps.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
         <div className="flex items-center gap-3 mb-3">
           <button
@@ -291,7 +291,7 @@ export default function Session() {
           />
         </div>
 
-        <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#e2e8f4] dark:border-[#1e2235] overflow-hidden mb-4">
+        <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] overflow-hidden mb-4">
           <div className="p-5 relative">
             <StepCard
               step={step}
@@ -305,7 +305,7 @@ export default function Session() {
               }}
             />
           </div>
-          <div className="border-t border-[#e2e8f4] dark:border-[#1e2235] p-5">
+          <div className="border-t border-[#dde1ef] dark:border-[#1e2235] p-5">
             <TimerRing timeLeft={session.timeLeft} totalTime={session.totalTime} stepType="active" />
             <div className="text-center text-sm text-[#64748b] dark:text-[#94a3b8] mt-2 mb-4">
               {step.durationMinutes} min

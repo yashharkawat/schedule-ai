@@ -57,7 +57,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16] text-[#0f172a] dark:text-[#f1f5f9]">
+      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] text-[#0f172a] dark:text-[#f1f5f9]">
         <Routes>
           <Route path="/sign-in/*" element={<div className="min-h-screen flex items-center justify-center p-4"><SignIn routing="path" path="/sign-in" afterSignInUrl="/" /></div>} />
           <Route path="/sign-up/*" element={<div className="min-h-screen flex items-center justify-center p-4"><SignUp routing="path" path="/sign-up" afterSignUpUrl="/" /></div>} />

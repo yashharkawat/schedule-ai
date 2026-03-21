@@ -15,7 +15,7 @@ export default function Home() {
 
   if (loading && !schedule) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#0c0e16]">
+      <div className="min-h-screen flex items-center justify-center bg-[#eef0f9] dark:bg-[#0c0e16]">
         <div className="w-8 h-8 border-4 border-[#6366f1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -24,7 +24,7 @@ export default function Home() {
   // ── NO SCHEDULE ──────────────────────────────────────────────────────────────
   if (!schedule) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16] flex flex-col">
+      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex flex-col">
         <div className="flex-1 max-w-lg mx-auto w-full px-5 pt-16 pb-28 flex flex-col items-center justify-center">
 
           {/* App icon + title */}
@@ -41,7 +41,7 @@ export default function Home() {
 
           {/* Feature highlights */}
           <div className="grid grid-cols-3 gap-3 w-full mb-10">
-            <div className="bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] rounded-2xl p-4 text-center">
+            <div className="bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] rounded-2xl p-4 text-center">
               <div className="w-9 h-9 bg-[#eef2ff] dark:bg-[#1e2040] rounded-xl flex items-center justify-center mx-auto mb-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
@@ -51,7 +51,7 @@ export default function Home() {
               </div>
               <p className="text-xs font-semibold text-[#0f172a] dark:text-[#f1f5f9] leading-tight">AI Import</p>
             </div>
-            <div className="bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] rounded-2xl p-4 text-center">
+            <div className="bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] rounded-2xl p-4 text-center">
               <div className="w-9 h-9 bg-[#eef2ff] dark:bg-[#1e2040] rounded-xl flex items-center justify-center mx-auto mb-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"/>
@@ -60,7 +60,7 @@ export default function Home() {
               </div>
               <p className="text-xs font-semibold text-[#0f172a] dark:text-[#f1f5f9] leading-tight">Guided Timer</p>
             </div>
-            <div className="bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] rounded-2xl p-4 text-center">
+            <div className="bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] rounded-2xl p-4 text-center">
               <div className="w-9 h-9 bg-[#eef2ff] dark:bg-[#1e2040] rounded-xl flex items-center justify-center mx-auto mb-2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -86,7 +86,7 @@ export default function Home() {
 
             <button
               onClick={() => navigate('/schedule/new')}
-              className="w-full group bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] rounded-xl py-3.5 px-6 font-semibold text-base flex items-center justify-center gap-3 hover:border-[#6366f1] dark:hover:border-[#6366f1] active:scale-[0.98] transition-all"
+              className="w-full group bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] rounded-xl py-3.5 px-6 font-semibold text-base flex items-center justify-center gap-3 hover:border-[#6366f1] dark:hover:border-[#6366f1] active:scale-[0.98] transition-all"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/>
@@ -107,7 +107,7 @@ export default function Home() {
   const otherDays = (schedule.days || []).filter(d => d.name !== todayName);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-5 pt-6 pb-28">
 
         {/* Top bar */}
@@ -115,7 +115,7 @@ export default function Home() {
           <h1 className="text-xl font-bold text-[#0f172a] dark:text-[#f1f5f9]">ScheduleAI</h1>
           <button
             onClick={() => navigate('/settings')}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white dark:bg-[#131720] border border-[#e2e8f4] dark:border-[#1e2235] text-[#64748b] dark:text-[#94a3b8] hover:text-[#6366f1] dark:hover:text-[#818cf8] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white dark:bg-[#131720] border border-[#dde1ef] dark:border-[#1e2235] text-[#64748b] dark:text-[#94a3b8] hover:text-[#6366f1] dark:hover:text-[#818cf8] transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"/>
@@ -190,7 +190,8 @@ export default function Home() {
                 return (
                   <div
                     key={day.id}
-                    className="bg-white dark:bg-[#131720] rounded-2xl border border-[#e2e8f4] dark:border-[#1e2235] flex items-center px-4 py-3 gap-3"
+                    onClick={() => stepCount > 0 && navigate(`/session/${day.id}`)}
+                    className={`bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] flex items-center px-4 py-3 gap-3 ${stepCount > 0 ? 'cursor-pointer active:scale-[0.99]' : ''}`}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -209,7 +210,7 @@ export default function Home() {
                       </p>
                     </div>
                     <button
-                      onClick={() => navigate(`/session/${day.id}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/session/${day.id}`); }}
                       disabled={stepCount === 0}
                       className={`flex-shrink-0 px-4 py-2 rounded-xl font-semibold text-sm flex items-center gap-1.5 active:scale-[0.98] transition-all ${
                         stepCount === 0

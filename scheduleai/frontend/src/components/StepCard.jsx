@@ -18,7 +18,7 @@ export default function StepCard({ step, stepNum, totalSteps, dayName, isSpeakin
           className={`absolute top-0 right-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
             isSpeaking
               ? 'bg-[#6366f1] text-white border-[#6366f1]'
-              : 'bg-[#f1f5f9] dark:bg-[#1e2235] text-[#64748b] dark:text-[#94a3b8] border-[#e2e8f4] dark:border-[#1e2235] hover:bg-[#eef2ff] dark:hover:bg-[#1e2040] hover:text-[#6366f1] dark:hover:text-[#818cf8] hover:border-[#6366f1] dark:hover:border-[#6366f1]'
+              : 'bg-[#f1f5f9] dark:bg-[#1e2235] text-[#64748b] dark:text-[#94a3b8] border-[#dde1ef] dark:border-[#1e2235] hover:bg-[#eef2ff] dark:hover:bg-[#1e2040] hover:text-[#6366f1] dark:hover:text-[#818cf8] hover:border-[#6366f1] dark:hover:border-[#6366f1]'
           }`}
         >
           {isSpeaking ? (

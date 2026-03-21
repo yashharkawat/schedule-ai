@@ -74,7 +74,7 @@ export default function ImportSchedule() {
   const activeDays = preview?.days?.filter(d => d.steps?.length > 0) || [];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -204,7 +204,7 @@ export default function ImportSchedule() {
                 {activeDays.map((day) => {
                   const mins = day.steps?.reduce((a, s) => a + (s.durationMinutes || 0), 0) || 0;
                   return (
-                    <div key={day.name} className="flex items-center justify-between py-2 border-t border-[#e2e8f4] dark:border-[#1e2235] first:border-0">
+                    <div key={day.name} className="flex items-center justify-between py-2 border-t border-[#dde1ef] dark:border-[#1e2235] first:border-0">
                       <div>
                         <span className="font-medium text-sm text-[#0f172a] dark:text-[#f1f5f9]">{day.name}</span>
                         <span className="text-xs text-[#64748b] dark:text-[#94a3b8] ml-2">

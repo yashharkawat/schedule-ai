@@ -41,7 +41,7 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#131720]/95 backdrop-blur-md border-t border-[#e2e8f4] dark:border-[#1e2235]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#131720]/95 backdrop-blur-md border-t border-[#dde1ef] dark:border-[#1e2235]">
       <div className="max-w-lg mx-auto flex justify-around items-center px-2 py-1 pb-safe">
         {links.map(({ to, label, Icon }) => {
           const active = location.pathname === to ||
