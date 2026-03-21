@@ -18,11 +18,15 @@ export default function Settings() {
   useEffect(() => {
     initVoices(setVoices);
     fetchLog();
-    // Check existing push subscription
+    // Check existing push subscription and re-sync to backend in case DB lost it
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker.ready.then(reg => {
-        reg.pushManager.getSubscription().then(sub => {
-          if (sub) setPushSub(sub);
+        reg.pushManager.getSubscription().then(async sub => {
+          if (sub) {
+            setPushSub(sub);
+            // Re-sync silently so backend always has the latest subscription
+            try { await api.subscribePush(sub.toJSON()); } catch {}
+          }
         });
       });
     }
