@@ -34,10 +34,16 @@ export default function Home() {
       </div>
 
       <button
-        onClick={() => navigate('/schedule/new')}
-        className="w-full py-4 bg-[#3d3420] text-white rounded-2xl font-semibold text-base hover:bg-[#2c2412] active:scale-95 transition-all"
+        onClick={() => navigate('/schedule/import')}
+        className="w-full py-4 bg-[#3d3420] text-white rounded-2xl font-semibold text-base hover:bg-[#2c2412] active:scale-95 transition-all mb-3"
       >
-        Create your schedule →
+        Import from document →
+      </button>
+      <button
+        onClick={() => navigate('/schedule/new')}
+        className="w-full py-4 border-2 border-[#3d3420] dark:border-gray-500 text-[#3d3420] dark:text-gray-100 rounded-2xl font-semibold text-base hover:bg-[#f0ece4] dark:hover:bg-gray-800 active:scale-95 transition-all"
+      >
+        Build manually →
       </button>
       <NavBar />
     </div>

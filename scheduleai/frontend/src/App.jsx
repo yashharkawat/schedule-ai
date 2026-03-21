@@ -8,6 +8,7 @@ import Schedule from './pages/Schedule.jsx';
 import Session from './pages/Session.jsx';
 import Settings from './pages/Settings.jsx';
 import ScheduleEditor from './pages/ScheduleEditor.jsx';
+import ImportSchedule from './pages/ImportSchedule.jsx';
 
 function AuthGuard({ children }) {
   const { isSignedIn, isLoaded } = useAuth();
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/" element={<AuthGuard><Home /></AuthGuard>} />
           <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
           <Route path="/schedule/new" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />
+          <Route path="/schedule/import" element={<AuthGuard><ImportSchedule /></AuthGuard>} />
           <Route path="/schedule/edit/:scheduleId" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />
           <Route path="/session/:dayId" element={<AuthGuard><Session /></AuthGuard>} />
           <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
