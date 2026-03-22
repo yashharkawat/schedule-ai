@@ -272,8 +272,9 @@ export default function Session() {
         >
           <div className="bg-black/70 backdrop-blur-md rounded-t-2xl px-6 pt-4 pb-10">
             <div className="w-10 h-1 bg-white/25 rounded-full mx-auto mb-5" />
-            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">{step?.title}</p>
-            <p className="text-white text-[15px] leading-relaxed">{step?.instructions}</p>
+            <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">Exercise</p>
+            <p className="text-white font-bold text-xl mb-4">{step?.title}</p>
+            <p className="text-white/80 text-[15px] leading-relaxed">{step?.instructions}</p>
             <button
               onClick={() => setShowInstructions(false)}
               className="mt-6 w-full py-3 rounded-sm bg-white/15 active:bg-white/25 text-white font-semibold text-sm transition-colors"
