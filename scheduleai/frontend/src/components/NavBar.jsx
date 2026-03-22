@@ -29,6 +29,16 @@ export default function NavBar() {
       ),
     },
     {
+      to: '/profile',
+      label: 'Profile',
+      icon: (active) => (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      ),
+    },
+    {
       to: '/settings',
       label: 'Settings',
       icon: (active) => (
@@ -45,7 +55,8 @@ export default function NavBar() {
       <div className="max-w-lg mx-auto flex justify-around items-center px-2 py-2">
         {links.map(({ to, label, icon }) => {
           const active = location.pathname === to ||
-            (to === '/schedule' && (location.pathname.startsWith('/schedule') && !location.pathname.startsWith('/schedule/import') && !location.pathname.startsWith('/schedule/new') && !location.pathname.startsWith('/schedule/edit')));
+            (to === '/schedule' && location.pathname.startsWith('/schedule') && !location.pathname.startsWith('/schedule/import') && !location.pathname.startsWith('/schedule/new') && !location.pathname.startsWith('/schedule/edit')) ||
+            (to === '/profile' && location.pathname.startsWith('/profile'));
           return (
             <Link
               key={to}

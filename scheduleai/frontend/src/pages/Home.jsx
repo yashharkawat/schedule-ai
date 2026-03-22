@@ -38,7 +38,8 @@ function TopBar({ settings, saveSettings, onMenu }) {
   );
 }
 
-function fmtTime(totalMin) {
+function fmtTime(totalMinRaw) {
+  const totalMin = Math.round(totalMinRaw);
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
   if (h > 0) return `${h}:${String(m).padStart(2, '0')}`;
@@ -47,16 +48,20 @@ function fmtTime(totalMin) {
 
 export default function Home() {
   const navigate = useNavigate();
-  const { schedule, log, streak, loading, settings, saveSettings } = useStore();
+  const { schedule, schedules, log, streak, loading, settings, saveSettings } = useStore();
   const [showMenu, setShowMenu] = useState(false);
   const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+  // Aggregate all days across all schedules, fall back to single schedule
+  const allSchedules = schedules?.length > 0 ? schedules : (schedule ? [schedule] : []);
+  const allDays = allSchedules.flatMap(s => (s.days || []).map(d => ({ ...d, scheduleTitle: s.title, restSeconds: s.restSeconds ?? 30 })));
 
   const todayLog = (day) => {
     const today = new Date().toISOString().split('T')[0];
     return log.find(l => l.dayId === day.id && new Date(l.completedAt).toISOString().split('T')[0] === today);
   };
 
-  if (loading && !schedule) {
+  if (loading && !schedule && schedules.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f0f5f5] dark:bg-[#0e2020]">
         <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -65,7 +70,7 @@ export default function Home() {
   }
 
   // NO SCHEDULE
-  if (!schedule) {
+  if (allDays.length === 0 && !loading) {
     return (
       <div className="min-h-screen bg-[#f0f5f5] dark:bg-[#0e2020] flex flex-col">
         <TopBar settings={settings} saveSettings={saveSettings} onMenu={() => navigate('/settings')} />
@@ -97,8 +102,7 @@ export default function Home() {
     );
   }
 
-  const todayDay = (schedule.days || []).find(d => d.name === todayName);
-  const allDays = schedule.days || [];
+  const todayDay = allDays.find(d => d.name === todayName);
 
   return (
     <div className="min-h-screen bg-[#f0f5f5] dark:bg-[#0e2020] flex flex-col">
@@ -121,7 +125,7 @@ export default function Home() {
               </div>
               <div className="bg-[#dce8e8] dark:bg-[#1a3535] mb-4">
                 <div className="px-4 py-4">
-                  <p className="text-[#4a7272] dark:text-[#6a9090] text-sm">{stepCount} exercise{stepCount !== 1 ? 's' : ''} · {totalMin} min</p>
+                  <p className="text-[#4a7272] dark:text-[#6a9090] text-sm">{stepCount} exercise{stepCount !== 1 ? 's' : ''} · {fmtTime(totalMin)}</p>
                 </div>
                 <button
                   onClick={() => stepCount > 0 && navigate(`/session/${todayDay.id}`)}
@@ -174,11 +178,16 @@ export default function Home() {
               <div key={day.id} className="bg-[#dce8e8] dark:bg-[#1a3535] px-4 pt-4 pb-0">
                 {/* Card header */}
                 <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[#0f2828] dark:text-white font-bold text-lg leading-tight ${isToday ? 'underline decoration-[#f2c029]' : ''}`}>
-                      {day.name}
-                    </span>
-                    {done && <span className="text-[#1a7070] dark:text-[#f2c029] text-xs font-bold">✓</span>}
+                  <div>
+                    {allSchedules.length > 1 && (
+                      <p className="text-[#6a9090] text-[10px] uppercase tracking-widest font-bold mb-0.5">{day.scheduleTitle}</p>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[#0f2828] dark:text-white font-bold text-lg leading-tight ${isToday ? 'underline decoration-[#f2c029]' : ''}`}>
+                        {day.name}
+                      </span>
+                      {done && <span className="text-[#1a7070] dark:text-[#f2c029] text-xs font-bold">✓</span>}
+                    </div>
                   </div>
                   <span className="text-[#4a7272] dark:text-[#6a9090] text-sm font-mono">{fmtTime(totalMin)}</span>
                 </div>
@@ -198,7 +207,7 @@ export default function Home() {
                     )}
                     <p className="text-[#4a7272] dark:text-[#6a9090] text-sm">
                       <span className="text-[#0f2828] dark:text-white font-semibold text-xs uppercase tracking-wider mr-2">REST</span>
-                      {schedule.restSeconds}s
+                      {day.restSeconds ?? 30}s
                     </p>
                   </div>
                 ) : (

@@ -8,7 +8,7 @@ const ACCEPTED = '.pdf,.docx';
 
 export default function ImportSchedule() {
   const navigate = useNavigate();
-  const { fetchSchedule } = useStore();
+  const { fetchSchedule, fetchSchedules } = useStore();
   const inputRef = useRef();
 
   const [dragging, setDragging] = useState(false);
@@ -58,6 +58,7 @@ export default function ImportSchedule() {
     setStatus('saving');
     try {
       await fetchSchedule();
+      await fetchSchedules();
       navigate('/schedule');
     } catch {
       navigate('/schedule');

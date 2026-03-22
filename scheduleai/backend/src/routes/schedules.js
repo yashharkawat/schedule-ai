@@ -10,6 +10,12 @@ router.get('/', requireAuth, async (req, res, next) => {
     const schedules = await req.prisma.schedule.findMany({
       where: { userId: req.user.id },
       orderBy: { createdAt: 'desc' },
+      include: {
+        days: {
+          orderBy: { sortOrder: 'asc' },
+          include: { steps: { orderBy: { sortOrder: 'asc' } } },
+        },
+      },
     });
     res.json(schedules);
   } catch (err) {
@@ -133,12 +139,6 @@ router.post('/import', requireAuth, async (req, res, next) => {
     const { title, description, restSeconds, days } = req.body;
     if (!title || !days) return res.status(400).json({ error: 'title and days required' });
 
-    // Deactivate existing
-    await req.prisma.schedule.updateMany({
-      where: { userId: req.user.id },
-      data: { isActive: false },
-    });
-
     const schedule = await req.prisma.schedule.create({
       data: {
         userId: req.user.id,
@@ -196,12 +196,6 @@ router.post('/import-ai', requireAuth, async (req, res, next) => {
     if (!title || !Array.isArray(days) || days.length === 0) {
       return res.status(422).json({ error: 'AI could not extract a valid schedule from this document' });
     }
-
-    // Deactivate existing schedules
-    await req.prisma.schedule.updateMany({
-      where: { userId: req.user.id },
-      data: { isActive: false },
-    });
 
     const schedule = await req.prisma.schedule.create({
       data: {

@@ -13,9 +13,12 @@ const PHASE = {
 export default function Session() {
   const { dayId } = useParams();
   const navigate = useNavigate();
-  const { schedule, settings, completeSession } = useStore();
+  const { schedule, schedules, settings, completeSession } = useStore();
 
-  const day = schedule?.days?.find(d => d.id === dayId);
+  const day = (schedules?.length > 0
+    ? schedules.flatMap(s => s.days || [])
+    : schedule?.days || []
+  ).find(d => d.id === dayId);
   const steps = day?.steps || [];
 
   const restSeconds = schedule?.restSeconds ?? 30;
@@ -142,7 +145,7 @@ export default function Session() {
       releaseWakeLock();
     }
     return () => clearInterval(intervalRef.current);
-  }, [running, onPhaseComplete, finalCount, soundEnabled, volume]);
+  }, [running, phase, onPhaseComplete, finalCount, soundEnabled, volume]);
 
   useEffect(() => () => { clearInterval(intervalRef.current); stopSpeech(); releaseWakeLock(); }, []);
 
@@ -154,7 +157,7 @@ export default function Session() {
 
   const handleSaveFinish = async () => {
     setSaving(true);
-    await completeSession(doneNote);
+    await completeSession(doneNote, dayId);
     navigate('/');
   };
 

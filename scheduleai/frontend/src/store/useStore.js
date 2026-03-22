@@ -6,6 +6,7 @@ const useStore = create(
   persist(
     (set, get) => ({
       schedule: null,
+      schedules: [],
       settings: {
         notifEnabled: false,
         notifTime: '08:00',
@@ -51,6 +52,18 @@ const useStore = create(
         } catch (err) {
           set({ loading: false, error: err.message });
           return null;
+        }
+      },
+
+      fetchSchedules: async () => {
+        try {
+          set({ loading: true, error: null });
+          const schedules = await api.getSchedules();
+          set({ schedules, loading: false });
+          return schedules;
+        } catch (err) {
+          set({ loading: false, error: err.message });
+          return [];
         }
       },
 
@@ -177,13 +190,15 @@ const useStore = create(
       resumeSession: () =>
         set((state) => ({ session: { ...state.session, running: true } })),
 
-      completeSession: async (notes) => {
+      completeSession: async (notes, dayId) => {
         const state = get();
-        const day = state.schedule?.days?.find(d => d.id === state.session.dayId);
+        const resolvedDayId = dayId || state.session.dayId;
+        const day = state.schedules?.flatMap(s => s.days || []).find(d => d.id === resolvedDayId)
+          || state.schedule?.days?.find(d => d.id === resolvedDayId);
         if (!day) return;
         try {
           await api.logSession({
-            dayId: day.id,
+            dayId: resolvedDayId,
             completedSteps: day.steps.length,
             totalSteps: day.steps.length,
             durationMinutes: day.steps.reduce((a, s) => a + s.durationMinutes, 0),
@@ -212,6 +227,7 @@ const useStore = create(
       name: 'scheduleai-storage',
       partialize: (state) => ({
         schedule: state.schedule,
+        schedules: state.schedules,
         settings: state.settings,
       }),
     }

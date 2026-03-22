@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 * { scroll-behavior: smooth; box-sizing: border-box; }
 html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }

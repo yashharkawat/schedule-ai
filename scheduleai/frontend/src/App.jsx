@@ -9,6 +9,7 @@ import Session from './pages/Session.jsx';
 import Settings from './pages/Settings.jsx';
 import ScheduleEditor from './pages/ScheduleEditor.jsx';
 import ImportSchedule from './pages/ImportSchedule.jsx';
+import Profile from './pages/Profile.jsx';
 
 function AuthGuard({ children }) {
   const { isSignedIn, isLoaded } = useAuth();
@@ -19,7 +20,7 @@ function AuthGuard({ children }) {
 
 export default function App() {
   const { getToken, isSignedIn, isLoaded } = useAuth();
-  const { settings, fetchSchedule, fetchSettings, fetchLog, fetchStreak } = useStore();
+  const { settings, fetchSchedule, fetchSchedules, fetchSettings, fetchLog, fetchStreak } = useStore();
 
   // Give the API layer access to Clerk tokens
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function App() {
     if (isSignedIn && isLoaded) {
       fetchSettings();
       fetchSchedule();
+      fetchSchedules();
       fetchLog();
       fetchStreak();
     }
@@ -78,6 +80,7 @@ export default function App() {
           <Route path="/schedule/edit/:scheduleId" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />
           <Route path="/session/:dayId" element={<AuthGuard><Session /></AuthGuard>} />
           <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
+          <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
         </Routes>
       </div>
     </BrowserRouter>
