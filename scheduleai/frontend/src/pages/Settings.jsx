@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '../lib/auth.jsx';
 import useStore from '../store/useStore.js';
 import NavBar from '../components/NavBar.jsx';
 import { api } from '../lib/api.js';
@@ -65,8 +65,7 @@ function SectionHeader({ title }) {
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, signOut } = useAuth();
   const { settings, saveSettings, log, fetchLog } = useStore();
   const [voices, setVoices] = useState([]);
   const [notifStatus, setNotifStatus] = useState('');
@@ -368,8 +367,8 @@ export default function Settings() {
         <div className="bg-[#dce8e8] dark:bg-[#1a3535]">
           {user && (
             <div className="px-5 py-4 border-b border-[#c4d8d8] dark:border-[#1e3838]">
-              <p className="text-[#0f2828] dark:text-white font-semibold">{user.fullName || 'Signed in'}</p>
-              <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{user.emailAddresses?.[0]?.emailAddress}</p>
+              <p className="text-[#0f2828] dark:text-white font-semibold">{user.name || 'Signed in'}</p>
+              <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{user.email}</p>
             </div>
           )}
           <div className="px-5 py-4 border-b border-[#c4d8d8] dark:border-[#1e3838]">
@@ -380,7 +379,7 @@ export default function Settings() {
           {user && (
             <div className="px-5 py-4">
               <button
-                onClick={() => signOut(() => navigate('/sign-in'))}
+                onClick={() => { signOut(); navigate('/sign-in'); }}
                 className="w-full py-3 bg-red-900/30 text-red-400 font-semibold text-sm active:opacity-70"
               >
                 Sign out

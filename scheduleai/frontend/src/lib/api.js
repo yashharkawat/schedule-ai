@@ -1,26 +1,14 @@
-// All backend API calls. Clerk token is fetched lazily via getToken().
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-let getTokenFn = null;
-
-export function setTokenGetter(fn) {
-  getTokenFn = fn;
-}
-
-async function authHeaders() {
-  const token = getTokenFn ? await getTokenFn() : null;
+function authHeaders() {
+  const token = localStorage.getItem('g-token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
 async function req(method, path, body) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(await authHeaders()),
-  };
   const res = await fetch(`${BASE}${path}`, {
     method,
-    headers,
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) {

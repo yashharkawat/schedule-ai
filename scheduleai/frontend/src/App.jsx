@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth, SignIn, SignUp } from '@clerk/clerk-react';
+import { useAuth } from './lib/auth.jsx';
 import useStore from './store/useStore.js';
-import { setTokenGetter } from './lib/api.js';
 import Home from './pages/Home.jsx';
 import Schedule from './pages/Schedule.jsx';
 import Session from './pages/Session.jsx';
@@ -10,35 +9,28 @@ import Settings from './pages/Settings.jsx';
 import ScheduleEditor from './pages/ScheduleEditor.jsx';
 import ImportSchedule from './pages/ImportSchedule.jsx';
 import Profile from './pages/Profile.jsx';
+import SignIn from './pages/SignIn.jsx';
 
 function AuthGuard({ children }) {
-  const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#6366f1] border-t-transparent rounded-full animate-spin" /></div>;
+  const { isSignedIn } = useAuth();
   if (!isSignedIn) return <Navigate to="/sign-in" replace />;
   return children;
 }
 
 export default function App() {
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn } = useAuth();
   const { settings, fetchSchedule, fetchSchedules, fetchSettings, fetchLog, fetchStreak } = useStore();
 
-  // Give the API layer access to Clerk tokens
   useEffect(() => {
-    setTokenGetter(getToken);
-  }, [getToken]);
-
-  // On sign-in: load everything from backend
-  useEffect(() => {
-    if (isSignedIn && isLoaded) {
+    if (isSignedIn) {
       fetchSettings();
       fetchSchedule();
       fetchSchedules();
       fetchLog();
       fetchStreak();
     }
-  }, [isSignedIn, isLoaded]);
+  }, [isSignedIn]);
 
-  // Haptic feedback on every button/interactive tap
   useEffect(() => {
     const handler = (e) => {
       if (e.target.closest('button, [role="button"], a, input[type="range"]')) {
@@ -49,7 +41,6 @@ export default function App() {
     return () => document.removeEventListener('pointerdown', handler);
   }, []);
 
-  // Keep-alive ping for Render free tier (pings /health every 8 min when enabled)
   useEffect(() => {
     if (!settings.keepAlive) return;
     const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -59,12 +50,10 @@ export default function App() {
     return () => clearInterval(id);
   }, [settings.keepAlive]);
 
-  // Theme (auto follows system preference)
   useEffect(() => {
     const apply = (theme) => {
       if (theme === 'auto') {
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
       } else {
         document.documentElement.classList.toggle('dark', theme === 'dark');
       }
@@ -82,8 +71,7 @@ export default function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-[#f0f5f5] dark:bg-[#0e2020] text-[#0f2828] dark:text-white">
         <Routes>
-          <Route path="/sign-in/*" element={<div className="min-h-screen flex items-center justify-center p-4"><SignIn routing="path" path="/sign-in" afterSignInUrl="/" /></div>} />
-          <Route path="/sign-up/*" element={<div className="min-h-screen flex items-center justify-center p-4"><SignUp routing="path" path="/sign-up" afterSignUpUrl="/" /></div>} />
+          <Route path="/sign-in" element={<SignIn />} />
           <Route path="/" element={<AuthGuard><Home /></AuthGuard>} />
           <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
           <Route path="/schedule/new" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />

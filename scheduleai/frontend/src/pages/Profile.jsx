@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '../lib/auth.jsx';
 import useStore from '../store/useStore.js';
 import NavBar from '../components/NavBar.jsx';
 
 const DOC_KEY = 'scheduleai-doc';
 
 export default function Profile() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { log, fetchLog, streak } = useStore();
   const [tab, setTab] = useState('progress'); // 'progress' | 'doc'
   const [docText, setDocText] = useState(() => localStorage.getItem(DOC_KEY) || '');
@@ -40,10 +40,10 @@ export default function Profile() {
       <div className="bg-[#1a3535] px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#f2c029] flex items-center justify-center text-[#0e2020] font-black text-base">
-            {user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() ?? '?'}
+            {user?.name?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div>
-            <p className="text-white font-bold text-base leading-tight">{user?.fullName || 'You'}</p>
+            <p className="text-white font-bold text-base leading-tight">{user?.name || 'You'}</p>
             <p className="text-[#6a9090] text-xs">{streak > 0 ? `🔥 ${streak} day streak` : 'No streak yet'}</p>
           </div>
         </div>

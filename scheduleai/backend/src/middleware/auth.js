@@ -1,7 +1,8 @@
-import { createClerkClient } from '@clerk/clerk-sdk-node';
+import { OAuth2Client } from 'google-auth-library';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export async function requireAuth(req, res, next) {
   try {
@@ -12,32 +13,32 @@ export async function requireAuth(req, res, next) {
 
     const token = authHeader.slice(7);
 
-    // Verify JWT with Clerk
-    const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
     let payload;
     try {
-      payload = await clerk.verifyToken(token);
-    } catch (e) {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const clerkId = payload.sub;
+    const googleId = payload.sub;
+    const email = payload.email || '';
+    const name = payload.name || null;
 
-    // Get or create user in our DB
-    let user = await prisma.user.findUnique({ where: { clerkId } });
+    let user = await prisma.user.findUnique({ where: { googleId } });
     if (!user) {
-      // First time — fetch user details from Clerk and create in DB
-      const clerkUser = await clerk.users.getUser(clerkId);
-      const email = clerkUser.emailAddresses[0]?.emailAddress || '';
-      const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || null;
-      user = await prisma.user.create({
-        data: {
-          clerkId,
-          email,
-          name,
-          settings: { create: {} }, // create default settings
-        },
-      });
+      // Try to link by email (preserves data for existing users)
+      user = await prisma.user.findUnique({ where: { email } });
+      if (user) {
+        user = await prisma.user.update({ where: { id: user.id }, data: { googleId } });
+      } else {
+        user = await prisma.user.create({
+          data: { googleId, email, name, settings: { create: {} } },
+        });
+      }
     }
 
     req.user = user;
