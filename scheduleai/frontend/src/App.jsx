@@ -38,6 +38,17 @@ export default function App() {
     }
   }, [isSignedIn, isLoaded]);
 
+  // Haptic feedback on every button/interactive tap
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.closest('button, [role="button"], a, input[type="range"]')) {
+        navigator.vibrate?.(8);
+      }
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, []);
+
   // Keep-alive ping for Render free tier (pings /health every 8 min when enabled)
   useEffect(() => {
     if (!settings.keepAlive) return;
