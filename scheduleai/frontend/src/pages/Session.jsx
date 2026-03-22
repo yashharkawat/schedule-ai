@@ -15,13 +15,29 @@ export default function Session() {
   const navigate = useNavigate();
   const { schedule, schedules, settings, completeSession } = useStore();
 
-  const day = (schedules?.length > 0
-    ? schedules.flatMap(s => s.days || [])
-    : schedule?.days || []
-  ).find(d => d.id === dayId);
+  // Quickstart mode — config stored in localStorage
+  const isQuickstart = dayId === 'quickstart';
+  const qsConfig = isQuickstart ? JSON.parse(localStorage.getItem('scheduleai-quickstart') || 'null') : null;
+
+  const day = isQuickstart
+    ? (qsConfig ? {
+        id: 'quickstart',
+        name: 'Quick Start',
+        steps: [{
+          id: 'qs-1',
+          title: qsConfig.title || 'Exercise',
+          durationMinutes: (qsConfig.workMinutes || 5) + (qsConfig.workSeconds || 0) / 60,
+          sets: qsConfig.sets || 1,
+          instructions: '',
+        }],
+      } : null)
+    : (schedules?.length > 0
+        ? schedules.flatMap(s => s.days || [])
+        : schedule?.days || []
+      ).find(d => d.id === dayId);
   const steps = day?.steps || [];
 
-  const restSeconds = schedule?.restSeconds ?? 30;
+  const restSeconds = isQuickstart ? (qsConfig?.restSeconds ?? 30) : (schedule?.restSeconds ?? 30);
   const prepareSeconds = settings.prepareSeconds ?? 5;
   const finalCount = settings.finalCount ?? 3;
   const soundEnabled = settings.soundsEnabled;
@@ -157,7 +173,7 @@ export default function Session() {
 
   const handleSaveFinish = async () => {
     setSaving(true);
-    await completeSession(doneNote, dayId);
+    if (!isQuickstart) await completeSession(doneNote, dayId);
     navigate('/');
   };
 

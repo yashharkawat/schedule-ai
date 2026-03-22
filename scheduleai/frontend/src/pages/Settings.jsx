@@ -347,6 +347,7 @@ export default function Settings() {
           </button>
           <Row label="Keep screen on" right={<Toggle value={settings.keepScreenOn} onChange={v => saveSettings({ keepScreenOn: v })} />} />
           <Row label="Keep server awake" sublabel="Pings backend every 8 min (Render)" right={<Toggle value={settings.keepAlive} onChange={v => saveSettings({ keepAlive: v })} />} />
+          <Row label="Show ads" sublabel="Support the app with ads" right={<Toggle value={settings.showAds ?? false} onChange={v => saveSettings({ showAds: v })} />} />
         </div>
 
         {/* Schedule section */}

@@ -22,6 +22,7 @@ const useStore = create(
         theme: 'auto',
         keepScreenOn: true,
         keepAlive: false,
+        showAds: false,
         prepareSeconds: 5,
         skipLastRest: false,
         finalCount: 3,

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore.js';
 import NavBar from '../components/NavBar.jsx';
+import { api } from '../lib/api.js';
 
 function TopBar({ settings, saveSettings, onMenu }) {
   return (
@@ -46,11 +47,63 @@ function fmtTime(totalMinRaw) {
   return `${String(m).padStart(2, '0')}:00`;
 }
 
+function NumStepper({ value, onDec, onInc, min = 0, max = 99 }) {
+  return (
+    <div className="flex items-center gap-3">
+      <button onClick={onDec} disabled={value <= min}
+        className="w-9 h-9 flex items-center justify-center bg-[#dce8e8] dark:bg-[#2c4848] text-[#0f2828] dark:text-white font-bold text-lg rounded-sm disabled:opacity-30 active:opacity-60">−</button>
+      <span className="text-[#0f2828] dark:text-white font-bold text-lg w-8 text-center tabular-nums">{value}</span>
+      <button onClick={onInc} disabled={value >= max}
+        className="w-9 h-9 flex items-center justify-center bg-[#dce8e8] dark:bg-[#2c4848] text-[#0f2828] dark:text-white font-bold text-lg rounded-sm disabled:opacity-30 active:opacity-60">+</button>
+    </div>
+  );
+}
+
+function fmtMmSs(min, sec) {
+  return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
 export default function Home() {
   const navigate = useNavigate();
-  const { schedule, schedules, log, streak, loading, settings, saveSettings } = useStore();
+  const { schedule, schedules, log, streak, loading, settings, saveSettings, fetchSchedules } = useStore();
   const [showMenu, setShowMenu] = useState(false);
+  const [showQS, setShowQS] = useState(false);
+  const [qsSaving, setQSSaving] = useState(false);
+
+  // Quickstart state
+  const [qsTitle, setQsTitle] = useState('Exercise');
+  const [qsSets, setQsSets] = useState(3);
+  const [qsWorkMin, setQsWorkMin] = useState(5);
+  const [qsWorkSec, setQsWorkSec] = useState(0);
+  const [qsRestSec, setQsRestSec] = useState(30);
+  // Save to schedule pickers
+  const [qsStep, setQsStep] = useState('config'); // 'config' | 'save'
+  const [qsPickedSched, setQsPickedSched] = useState(null);
+  const [qsPickedDay, setQsPickedDay] = useState(null);
   const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+  const openQS = () => { setQsStep('config'); setQsPickedSched(null); setQsPickedDay(null); setShowQS(true); };
+  const closeQS = () => setShowQS(false);
+
+  const startNow = () => {
+    localStorage.setItem('scheduleai-quickstart', JSON.stringify({
+      title: qsTitle, sets: qsSets, workMinutes: qsWorkMin, workSeconds: qsWorkSec, restSeconds: qsRestSec,
+    }));
+    setShowQS(false);
+    navigate('/session/quickstart');
+  };
+
+  const saveToSchedule = async () => {
+    if (!qsPickedDay) return;
+    setQSSaving(true);
+    try {
+      const durationMinutes = qsWorkMin + qsWorkSec / 60;
+      await api.createStep(qsPickedDay, { title: qsTitle, durationMinutes: Math.max(1, Math.round(durationMinutes)), sets: qsSets, instructions: '' });
+      await fetchSchedules();
+      setShowQS(false);
+    } catch (e) { alert('Failed to save: ' + e.message); }
+    setQSSaving(false);
+  };
 
   // Aggregate all days across all schedules, fall back to single schedule
   const allSchedules = schedules?.length > 0 ? schedules : (schedule ? [schedule] : []);
@@ -145,6 +198,24 @@ export default function Home() {
             </div>
           );
         })()}
+
+        {/* QUICK START */}
+        <div className="px-4 mt-3 mb-1">
+          <button
+            onClick={openQS}
+            className="w-full py-3.5 bg-[#dce8e8] dark:bg-[#1a3535] border border-dashed border-[#4a7272] dark:border-[#4a7070] text-[#4a7272] dark:text-[#6a9090] font-bold text-sm flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            QUICK START
+          </button>
+        </div>
+
+        {/* Ad banner (configurable) */}
+        {settings.showAds && (
+          <div className="mx-4 mt-3 mb-1 bg-[#dce8e8] dark:bg-[#1a3535] border border-[#c4d8d8] dark:border-[#264040] px-4 py-3 flex items-center justify-center">
+            <p className="text-[#8aacac] dark:text-[#4a7070] text-xs text-center">[ Advertisement ]</p>
+          </div>
+        )}
 
         {/* YOUR SCHEDULE header */}
         <div className="px-4 mt-2 mb-3 flex items-center justify-between">
@@ -246,6 +317,123 @@ export default function Home() {
           })}
         </div>
       </div>
+
+      {/* Quick Start sheet */}
+      {showQS && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={closeQS}>
+          <div className="bg-[#f0f5f5] dark:bg-[#1a3535] rounded-t-2xl px-5 pt-4 pb-10 max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-[#c4d8d8] dark:bg-[#264040] rounded-full mx-auto mb-5" />
+
+            {qsStep === 'config' && (
+              <>
+                <p className="text-[#0f2828] dark:text-white font-black text-xl mb-5">Quick Start</p>
+
+                {/* Title */}
+                <div className="mb-5">
+                  <p className="text-[#4a7272] dark:text-[#6a9090] text-xs font-bold uppercase tracking-widest mb-2">Exercise name</p>
+                  <input
+                    className="w-full bg-[#dce8e8] dark:bg-[#264040] text-[#0f2828] dark:text-white px-3 py-2.5 text-base focus:outline-none"
+                    value={qsTitle}
+                    onChange={e => setQsTitle(e.target.value)}
+                    placeholder="Exercise"
+                  />
+                </div>
+
+                {/* Sets */}
+                <div className="flex items-center justify-between py-4 border-b border-[#c4d8d8] dark:border-[#264040]">
+                  <p className="text-[#0f2828] dark:text-white font-semibold">Sets</p>
+                  <NumStepper value={qsSets} min={1} max={20} onDec={() => setQsSets(v => Math.max(1,v-1))} onInc={() => setQsSets(v => Math.min(20,v+1))} />
+                </div>
+
+                {/* Work */}
+                <div className="flex items-center justify-between py-4 border-b border-[#c4d8d8] dark:border-[#264040]">
+                  <div>
+                    <p className="text-[#0f2828] dark:text-white font-semibold">Work</p>
+                    <p className="text-[#4a7272] dark:text-[#6a9090] text-xs">{fmtMmSs(qsWorkMin, qsWorkSec)}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <p className="text-[#4a7272] dark:text-[#6a9090] text-[10px] mb-1">MIN</p>
+                      <NumStepper value={qsWorkMin} min={0} max={60} onDec={() => setQsWorkMin(v => Math.max(0,v-1))} onInc={() => setQsWorkMin(v => Math.min(60,v+1))} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[#4a7272] dark:text-[#6a9090] text-[10px] mb-1">SEC</p>
+                      <NumStepper value={qsWorkSec} min={0} max={55} onDec={() => setQsWorkSec(v => Math.max(0,v-5))} onInc={() => setQsWorkSec(v => Math.min(55,v+5))} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rest */}
+                <div className="flex items-center justify-between py-4 border-b border-[#c4d8d8] dark:border-[#264040]">
+                  <div>
+                    <p className="text-[#0f2828] dark:text-white font-semibold">Rest</p>
+                    <p className="text-[#4a7272] dark:text-[#6a9090] text-xs">{qsRestSec}s</p>
+                  </div>
+                  <NumStepper value={qsRestSec} min={0} max={120} onDec={() => setQsRestSec(v => Math.max(0,v-5))} onInc={() => setQsRestSec(v => Math.min(120,v+5))} />
+                </div>
+
+                <button
+                  onClick={startNow}
+                  disabled={qsWorkMin === 0 && qsWorkSec === 0}
+                  className="w-full mt-5 py-4 bg-[#f2c029] text-[#0e2020] font-bold text-base active:opacity-70 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Start now
+                </button>
+                <button
+                  onClick={() => { setQsPickedSched(null); setQsPickedDay(null); setQsStep('save'); }}
+                  className="w-full mt-3 py-3 text-[#4a7272] dark:text-[#6a9090] font-semibold text-sm active:opacity-70"
+                >
+                  Save to schedule
+                </button>
+              </>
+            )}
+
+            {qsStep === 'save' && (
+              <>
+                <div className="flex items-center gap-3 mb-5">
+                  <button onClick={() => setQsStep('config')} className="text-[#4a7272] dark:text-[#6a9090]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <p className="text-[#0f2828] dark:text-white font-black text-xl">Save to schedule</p>
+                </div>
+                {allSchedules.length === 0 ? (
+                  <p className="text-[#4a7272] dark:text-[#6a9090] text-sm text-center py-8">No schedules yet. Create one first.</p>
+                ) : (
+                  <>
+                    {allSchedules.map(sched => (
+                      <div key={sched.id} className="mb-3">
+                        <p className="text-[#0f2828] dark:text-white font-bold text-sm mb-1 px-1">{sched.title}</p>
+                        {(sched.days || []).map(day => (
+                          <button
+                            key={day.id}
+                            onClick={() => { setQsPickedSched(sched.id); setQsPickedDay(day.id); }}
+                            className={`w-full flex items-center justify-between px-4 py-3 mb-0.5 text-left transition-colors ${
+                              qsPickedDay === day.id
+                                ? 'bg-[#f2c029] text-[#0e2020]'
+                                : 'bg-[#dce8e8] dark:bg-[#264040] text-[#0f2828] dark:text-white'
+                            }`}
+                          >
+                            <span className="font-semibold text-sm">{day.name}</span>
+                            <span className="text-xs opacity-60">{(day.steps||[]).length} exercises</span>
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                    <button
+                      onClick={saveToSchedule}
+                      disabled={!qsPickedDay || qsSaving}
+                      className="w-full mt-4 py-4 bg-[#f2c029] text-[#0e2020] font-bold text-base active:opacity-70 disabled:opacity-40"
+                    >
+                      {qsSaving ? 'Saving...' : 'Add to day'}
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Menu overlay */}
       {showMenu && (
