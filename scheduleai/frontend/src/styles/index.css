@@ -3,23 +3,42 @@
 * { scroll-behavior: smooth; box-sizing: border-box; }
 html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 
-/* ── Light mode ───────────────────────────────── */
 body {
-  background: #f0f2ff;
-  color: #0f172a;
+  background: #f0f5f5;
+  color: #0f2828;
   font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Dark mode ────────────────────────────────── */
-.dark body { background: #0c0e16; color: #f1f5f9; }
+.dark body { background: #0e2020; color: #ffffff; }
 
-::selection { background: rgba(99,102,241,0.25); }
+::selection { background: rgba(26,112,112,0.25); }
 
-/* ── Light mode card elevation ────────────────── */
-/* White cards with indigo-tinted shadow instead of flat borders */
-:root:not(.dark) .lm-elevated {
-  box-shadow: 0 1px 3px rgba(99,102,241,0.08), 0 4px 16px rgba(99,102,241,0.06);
-  border-color: transparent !important;
+/* Range slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: none;
 }

@@ -6,13 +6,59 @@ import useStore from '../store/useStore.js';
 const DEFAULT_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function emptyStep(index) {
-  return {
-    _id: `step-${Date.now()}-${index}`,
-    title: '',
-    durationMinutes: 5,
-    instructions: '',
-    sets: 1,
-  };
+  return { _id: `step-${Date.now()}-${index}`, title: '', durationMinutes: 3, instructions: '', sets: 3 };
+}
+
+function fmtMmSs(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+}
+
+function TimeStepper({ label, valueSec, onDec, onInc }) {
+  return (
+    <div className="py-5">
+      <p className="text-[#6a9090] text-xs font-bold uppercase tracking-widest text-center mb-3">{label}</p>
+      <div className="flex items-center justify-center gap-6">
+        <button
+          onClick={onDec}
+          className="w-12 h-12 flex items-center justify-center bg-[#2c4848] text-white font-bold text-2xl rounded-sm active:opacity-70"
+        >
+          −
+        </button>
+        <span className="text-white font-light text-3xl min-w-[7rem] text-center tabular-nums">{fmtMmSs(valueSec)}</span>
+        <button
+          onClick={onInc}
+          className="w-12 h-12 flex items-center justify-center bg-[#2c4848] text-white font-bold text-2xl rounded-sm active:opacity-70"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CountStepper({ label, value, onDec, onInc }) {
+  return (
+    <div className="py-5">
+      <p className="text-[#6a9090] text-xs font-bold uppercase tracking-widest text-center mb-3">{label}</p>
+      <div className="flex items-center justify-center gap-6">
+        <button
+          onClick={onDec}
+          className="w-12 h-12 flex items-center justify-center bg-[#2c4848] text-white font-bold text-2xl rounded-sm active:opacity-70"
+        >
+          −
+        </button>
+        <span className="text-white font-light text-4xl min-w-[3rem] text-center tabular-nums">{value}</span>
+        <button
+          onClick={onInc}
+          className="w-12 h-12 flex items-center justify-center bg-[#2c4848] text-white font-bold text-2xl rounded-sm active:opacity-70"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function ScheduleEditor() {
@@ -24,13 +70,16 @@ export default function ScheduleEditor() {
   const [days, setDays] = useState(
     DEFAULT_DAYS.map((name, i) => ({ _id: `day-${i}`, name, steps: [] }))
   );
-  const [expandedDay, setExpandedDay] = useState(0);
+  const [expandedDay, setExpandedDay] = useState(null);
+  const [expandedStep, setExpandedStep] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const addStep = (di) => {
     const newDays = [...days];
-    newDays[di] = { ...newDays[di], steps: [...newDays[di].steps, emptyStep(newDays[di].steps.length)] };
+    const step = emptyStep(newDays[di].steps.length);
+    newDays[di] = { ...newDays[di], steps: [...newDays[di].steps, step] };
     setDays(newDays);
+    setExpandedStep(step._id);
   };
 
   const removeStep = (di, si) => {
@@ -39,6 +88,7 @@ export default function ScheduleEditor() {
     steps.splice(si, 1);
     newDays[di] = { ...newDays[di], steps };
     setDays(newDays);
+    setExpandedStep(null);
   };
 
   const updateStep = (di, si, field, value) => {
@@ -50,23 +100,22 @@ export default function ScheduleEditor() {
   };
 
   const handleSave = async () => {
-    if (!title.trim()) { alert('Please enter a schedule title.'); return; }
+    if (!title.trim()) { alert('Please enter a schedule name.'); return; }
     setSaving(true);
     try {
-      const payload = {
+      await api.importSchedule({
         title: title.trim(),
         restSeconds: Number(restSeconds) || 30,
-        days: days.map((day) => ({
+        days: days.map(day => ({
           name: day.name,
-          steps: day.steps.map((step) => ({
-            title: step.title || `Exercise`,
-            durationMinutes: Number(step.durationMinutes) || 5,
+          steps: day.steps.map(step => ({
+            title: step.title || 'Exercise',
+            durationMinutes: Number(step.durationMinutes) || 3,
             instructions: step.instructions || null,
             sets: Number(step.sets) || 1,
           })),
         })),
-      };
-      await api.importSchedule(payload);
+      });
       await fetchSchedule();
       navigate('/schedule');
     } catch (err) {
@@ -76,149 +125,182 @@ export default function ScheduleEditor() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
-      <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 text-[#64748b] hover:text-[#0f172a] dark:hover:text-[#f1f5f9] text-sm font-medium transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6"/>
-            </svg>
-            Back
-          </button>
-          <h1 className="flex-1 text-xl font-bold text-[#0f172a] dark:text-[#f1f5f9]">New Schedule</h1>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 bg-[#6366f1] hover:bg-[#4f46e5] text-white rounded-xl text-sm font-semibold disabled:opacity-50 active:scale-95 transition-all"
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
+  // Compute total time
+  const totalSec = days.reduce((acc, day) =>
+    acc + day.steps.reduce((a, s) => a + (Number(s.durationMinutes) || 0) * 60 * (Number(s.sets) || 1), 0) + (day.steps.length > 1 ? (day.steps.length - 1) * restSeconds : 0), 0
+  );
+  const totalMin = Math.floor(totalSec / 60);
+  const totalS = totalSec % 60;
 
-        {/* Schedule title + rest time */}
-        <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] p-4 mb-4 space-y-3">
-          <div>
-            <label className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider">Schedule name</label>
+  return (
+    <div className="min-h-screen bg-[#0e2020] flex flex-col">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-[#1a3535]">
+        <button onClick={() => navigate(-1)} className="text-white/60 hover:text-white transition-colors p-1">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <p className="text-white font-bold text-base">New Schedule</p>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="text-[#f2c029] font-bold text-sm disabled:opacity-50 flex items-center gap-1.5"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+          </svg>
+          {saving ? 'Saving...' : 'SAVE'}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto pb-20">
+        {/* Schedule name */}
+        <div className="px-5 pt-6 pb-4">
+          <div className="border border-[#4a7070] px-4 py-3">
+            <label className="text-[#6a9090] text-xs uppercase tracking-widest block mb-1">Schedule Name</label>
             <input
-              className="mt-1 w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
-              placeholder="e.g. Morning routine"
+              className="w-full bg-transparent text-white text-base placeholder-[#4a7070] focus:outline-none"
+              placeholder="e.g. Morning Routine"
               value={title}
               onChange={e => setTitle(e.target.value)}
             />
           </div>
-          <div>
-            <label className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider">Rest between exercises</label>
-            <div className="flex items-center gap-3 mt-1">
-              <input
-                type="number"
-                min="0"
-                max="300"
-                className="w-24 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
-                value={restSeconds}
-                onChange={e => setRestSeconds(e.target.value)}
-              />
-              <span className="text-sm text-[#64748b] dark:text-[#94a3b8]">seconds</span>
-            </div>
-          </div>
+        </div>
+
+        {/* Rest between exercises */}
+        <div className="px-5 border-b border-[#1e3838]">
+          <TimeStepper
+            label="Rest between exercises"
+            valueSec={restSeconds}
+            onDec={() => setRestSeconds(s => Math.max(0, s - 5))}
+            onInc={() => setRestSeconds(s => Math.min(300, s + 5))}
+          />
         </div>
 
         {/* Days */}
-        <div className="space-y-3">
+        <div className="mt-2">
           {days.map((day, di) => {
-            const totalMin = day.steps.reduce((a, s) => a + (Number(s.durationMinutes) || 0), 0);
+            const totalMin = day.steps.reduce((a, s) => a + (Number(s.durationMinutes) || 0) * (Number(s.sets) || 1), 0);
             const isOpen = expandedDay === di;
 
             return (
-              <div key={day._id} className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
+              <div key={day._id} className="border-b border-[#1e3838]">
+                {/* Day header */}
                 <button
-                  onClick={() => setExpandedDay(isOpen ? -1 : di)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-[#f0f2ff] dark:hover:bg-[#0c0e16] transition-colors"
+                  onClick={() => { setExpandedDay(isOpen ? null : di); setExpandedStep(null); }}
+                  className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1a3535] transition-colors"
                 >
-                  <div>
-                    <div className="font-semibold text-[#0f172a] dark:text-[#f1f5f9]">{day.name}</div>
-                    <div className="text-xs text-[#64748b] dark:text-[#94a3b8] mt-0.5">
-                      {day.steps.length} exercise{day.steps.length !== 1 ? 's' : ''}{totalMin > 0 ? ` · ${totalMin} min` : ''}
-                    </div>
+                  <span className="text-white font-semibold text-base">{day.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[#6a9090] text-sm">
+                      {day.steps.length > 0 ? `${day.steps.length} ex · ${totalMin} min` : 'Empty'}
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`text-[#4a7070] transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
                   </div>
-                  <span className="text-[#94a3b8]">
-                    {isOpen ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="18 15 12 9 6 15"/>
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="6 9 12 15 18 9"/>
-                      </svg>
-                    )}
-                  </span>
                 </button>
 
+                {/* Day content */}
                 {isOpen && (
-                  <div className="border-t border-[#dde1ef] dark:border-[#1e2235]">
-                    {day.steps.map((step, si) => (
-                      <div key={step._id} className="border-b border-[#dde1ef] dark:border-[#1e2235] p-3 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-[#94a3b8] w-6">#{si + 1}</span>
-                          <input
-                            className="flex-1 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
-                            placeholder="Exercise name"
-                            value={step.title}
-                            onChange={e => updateStep(di, si, 'title', e.target.value)}
-                          />
-                          {/* Sets stepper */}
-                          <div className="flex items-center gap-0.5">
-                            <button
-                              onClick={() => updateStep(di, si, 'sets', Math.max(1, (step.sets || 1) - 1))}
-                              className="w-6 h-6 bg-[#dde1ef] dark:bg-[#1e2235] rounded-lg text-[#64748b] dark:text-[#94a3b8] flex items-center justify-center text-xs font-bold hover:bg-[#6366f1] hover:text-white transition-colors"
-                            >−</button>
-                            <span className="w-6 text-center text-xs font-semibold text-[#0f172a] dark:text-[#f1f5f9]">{step.sets || 1}x</span>
-                            <button
-                              onClick={() => updateStep(di, si, 'sets', Math.min(20, (step.sets || 1) + 1))}
-                              className="w-6 h-6 bg-[#dde1ef] dark:bg-[#1e2235] rounded-lg text-[#64748b] dark:text-[#94a3b8] flex items-center justify-center text-xs font-bold hover:bg-[#6366f1] hover:text-white transition-colors"
-                            >+</button>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="number"
-                              min="1"
-                              className="w-16 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-2 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] text-center transition-colors"
-                              value={step.durationMinutes}
-                              onChange={e => updateStep(di, si, 'durationMinutes', e.target.value)}
-                            />
-                            <span className="text-xs text-[#94a3b8]">min</span>
-                          </div>
+                  <div className="bg-[#0a1818]">
+                    {day.steps.map((step, si) => {
+                      const isStepOpen = expandedStep === step._id;
+                      return (
+                        <div key={step._id} className="border-b border-[#1e3838]">
+                          {/* Step header */}
                           <button
-                            onClick={() => removeStep(di, si)}
-                            className="w-7 h-7 flex items-center justify-center text-[#94a3b8] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            onClick={() => setExpandedStep(isStepOpen ? null : step._id)}
+                            className="w-full flex items-center justify-between px-5 py-4"
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <line x1="18" y1="6" x2="6" y2="18"/>
-                              <line x1="6" y1="6" x2="18" y2="18"/>
-                            </svg>
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <span className="text-[#4a7070] text-xs font-bold">#{si + 1}</span>
+                              <span className="text-white text-sm truncate">{step.title || 'Untitled'}</span>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                              <span className="text-[#6a9090] text-xs">{step.sets || 1}x · {step.durationMinutes}min</span>
+                              <button
+                                onClick={e => { e.stopPropagation(); removeStep(di, si); }}
+                                className="text-red-500/50 hover:text-red-500 transition-colors"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                              </button>
+                            </div>
                           </button>
-                        </div>
-                        <div className="pl-6">
-                          <textarea
-                            className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] resize-none transition-colors"
-                            rows={2}
-                            placeholder="Description (optional)"
-                            value={step.instructions}
-                            onChange={e => updateStep(di, si, 'instructions', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    ))}
 
+                          {/* Step detail */}
+                          {isStepOpen && (
+                            <div className="px-5 pb-5">
+                              {/* Exercise name */}
+                              <div className="border border-[#4a7070] px-4 py-3 mb-1">
+                                <label className="text-[#6a9090] text-xs uppercase tracking-widest block mb-1">Exercise Name</label>
+                                <input
+                                  className="w-full bg-transparent text-white text-base placeholder-[#4a7070] focus:outline-none"
+                                  placeholder="e.g. Palming"
+                                  value={step.title}
+                                  onChange={e => updateStep(di, si, 'title', e.target.value)}
+                                />
+                              </div>
+
+                              {/* PREPARE - global setting, just show */}
+                              <div className="py-4 border-b border-[#1e3838]">
+                                <p className="text-[#6a9090] text-xs font-bold uppercase tracking-widest text-center mb-1">Prepare</p>
+                                <p className="text-[#4a7070] text-center text-sm">Global setting</p>
+                              </div>
+
+                              {/* SETS */}
+                              <div className="border-b border-[#1e3838]">
+                                <CountStepper
+                                  label="Sets"
+                                  value={step.sets || 1}
+                                  onDec={() => updateStep(di, si, 'sets', Math.max(1, (step.sets || 1) - 1))}
+                                  onInc={() => updateStep(di, si, 'sets', Math.min(20, (step.sets || 1) + 1))}
+                                />
+                              </div>
+
+                              {/* WORK */}
+                              <div className="border-b border-[#1e3838]">
+                                <TimeStepper
+                                  label="Work"
+                                  valueSec={(Number(step.durationMinutes) || 1) * 60}
+                                  onDec={() => updateStep(di, si, 'durationMinutes', Math.max(1, (Number(step.durationMinutes) || 1) - 1))}
+                                  onInc={() => updateStep(di, si, 'durationMinutes', Math.min(60, (Number(step.durationMinutes) || 1) + 1))}
+                                />
+                              </div>
+
+                              {/* REST - global setting */}
+                              <div className="py-4 border-b border-[#1e3838]">
+                                <p className="text-[#6a9090] text-xs font-bold uppercase tracking-widest text-center mb-1">Rest</p>
+                                <p className="text-[#4a7070] text-center text-sm">Global setting ({restSeconds}s)</p>
+                              </div>
+
+                              {/* Description */}
+                              <div className="border border-[#4a7070] px-4 py-3 mt-3">
+                                <label className="text-[#6a9090] text-xs uppercase tracking-widest block mb-1">Description</label>
+                                <textarea
+                                  className="w-full bg-transparent text-white text-sm placeholder-[#4a7070] focus:outline-none resize-none"
+                                  rows={2}
+                                  placeholder="Instructions (optional)"
+                                  value={step.instructions}
+                                  onChange={e => updateStep(di, si, 'instructions', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {/* Add exercise */}
                     <button
                       onClick={() => addStep(di)}
-                      className="w-full py-3 text-sm text-[#6366f1] dark:text-[#818cf8] font-medium hover:bg-[#eef2ff] dark:hover:bg-[#1e2040] transition-colors"
+                      className="w-full py-4 text-[#f2c029] font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:opacity-70 transition-opacity"
                     >
-                      + Add exercise
+                      + ADD EXERCISE
                     </button>
                   </div>
                 )}
@@ -226,14 +308,14 @@ export default function ScheduleEditor() {
             );
           })}
         </div>
+      </div>
 
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="mt-6 w-full py-3.5 bg-[#6366f1] hover:bg-[#4f46e5] text-white rounded-xl font-semibold text-base disabled:opacity-50 active:scale-[0.98] transition-all shadow-sm"
-        >
-          {saving ? 'Saving...' : 'Save schedule'}
-        </button>
+      {/* Sticky bottom: total */}
+      <div className="border-t border-[#1e3838] bg-[#0a1818] px-5 py-4 flex items-center justify-between">
+        <span className="text-[#6a9090] text-xs font-bold uppercase tracking-widest">TOTAL</span>
+        <span className="text-white font-bold text-base">
+          {String(Math.floor(totalSec / 60)).padStart(2,'0')}:{String(totalSec % 60).padStart(2,'0')}
+        </span>
       </div>
     </div>
   );
