@@ -83,6 +83,7 @@ model UserSettings {
   soundVolume    Float   @default(0.8)
   theme          String  @default("light")
   keepScreenOn   Boolean @default(true)
+  notifTimezone  Int     @default(0)
 }
 
 model PushSubscription {

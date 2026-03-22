@@ -105,7 +105,7 @@ export default function Settings() {
   const Section = ({ title, children }) => (
     <div className="mb-5">
       <h2 className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider mb-2">{title}</h2>
-      <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
+      <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
         {children}
       </div>
     </div>
@@ -122,7 +122,7 @@ export default function Settings() {
   );
 
   return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
         <h1 className="text-xl font-bold text-[#0f172a] dark:text-[#f1f5f9] mb-6">Settings</h1>
 
@@ -164,7 +164,7 @@ export default function Settings() {
             <label className="text-xs text-[#64748b] dark:text-[#94a3b8] mb-1 block">Remind me at</label>
             <input
               type="time"
-              className="border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
+              className="border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
               value={settings.notifTime}
               onChange={e => saveSettings({ notifTime: e.target.value })}
             />
@@ -198,13 +198,13 @@ export default function Settings() {
           <div className="px-4 py-3 border-b border-[#dde1ef] dark:border-[#1e2235]">
             <label className="text-xs text-[#64748b] dark:text-[#94a3b8] mb-1 block">Message</label>
             <input
-              className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
+              className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
               value={settings.notifMessage}
               onChange={e => saveSettings({ notifMessage: e.target.value })}
             />
           </div>
           {notifStatus && (
-            <div className="px-4 py-2 text-xs text-[#64748b] dark:text-[#94a3b8] bg-[#eef0f9] dark:bg-[#0c0e16]">
+            <div className="px-4 py-2 text-xs text-[#64748b] dark:text-[#94a3b8] bg-[#f0f2ff] dark:bg-[#0c0e16]">
               {notifStatus}
             </div>
           )}
@@ -246,7 +246,7 @@ export default function Settings() {
           <div className="px-4 py-3 border-b border-[#dde1ef] dark:border-[#1e2235]">
             <label className="text-xs text-[#64748b] dark:text-[#94a3b8] mb-1 block">Voice</label>
             <select
-              className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
+              className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-1.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
               value={settings.voiceName}
               onChange={e => saveSettings({ voiceName: e.target.value })}
             >

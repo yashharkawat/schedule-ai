@@ -184,7 +184,7 @@ export default function Session() {
   }, []);
 
   if (!day || !step) return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex items-center justify-center">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16] flex items-center justify-center">
       <p className="text-[#64748b] dark:text-[#94a3b8]">Loading...</p>
     </div>
   );
@@ -193,7 +193,7 @@ export default function Session() {
   if (showDone) {
     const total = day.steps.reduce((a, s) => a + s.durationMinutes, 0);
     return (
-      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex flex-col">
+      <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16] flex flex-col">
         <div className="max-w-lg mx-auto w-full px-4 pt-16 pb-8 flex flex-col items-center text-center flex-1">
           {/* Indigo checkmark circle */}
           <div className="w-20 h-20 bg-[#6366f1] rounded-full flex items-center justify-center mb-6 shadow-lg">
@@ -226,7 +226,7 @@ export default function Session() {
   if (session.isResting) {
     const nextStep = day.steps[session.currentStepIndex + 1];
     return (
-      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+      <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
         <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
           <div className="flex items-center gap-3 mb-6">
             <button
@@ -241,11 +241,11 @@ export default function Session() {
             <div className="flex-1 text-center text-sm text-[#64748b] dark:text-[#94a3b8]">{day.name}</div>
           </div>
 
-          <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] p-8 text-center">
+          <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] p-8 text-center">
             <p className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider mb-3">Rest</p>
             <div className="text-6xl font-bold text-[#6366f1] mb-4">{session.restTimeLeft}s</div>
             {nextStep && (
-              <div className="bg-[#eef0f9] dark:bg-[#0c0e16] rounded-xl px-4 py-3 mb-6">
+              <div className="bg-[#f0f2ff] dark:bg-[#0c0e16] rounded-xl px-4 py-3 mb-6">
                 <p className="text-xs text-[#64748b] dark:text-[#94a3b8] mb-1">Up next</p>
                 <p className="text-sm font-semibold text-[#0f172a] dark:text-[#f1f5f9]">{nextStep.title || `Exercise ${session.currentStepIndex + 2}`}</p>
                 <p className="text-xs text-[#64748b] dark:text-[#94a3b8] mt-0.5">{nextStep.durationMinutes} min</p>
@@ -267,7 +267,7 @@ export default function Session() {
   const progressPct = (session.currentStepIndex / day.steps.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-4 pb-8">
         <div className="flex items-center gap-3 mb-3">
           <button
@@ -291,7 +291,7 @@ export default function Session() {
           />
         </div>
 
-        <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] overflow-hidden mb-4">
+        <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] overflow-hidden mb-4">
           <div className="p-5 relative">
             <StepCard
               step={step}

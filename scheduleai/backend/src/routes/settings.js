@@ -24,7 +24,7 @@ router.get('/', requireAuth, async (req, res, next) => {
 router.put('/', requireAuth, async (req, res, next) => {
   try {
     const {
-      notifEnabled, notifTime, notifDays, notifMessage,
+      notifEnabled, notifTime, notifDays, notifMessage, notifTimezone,
       voiceEnabled, voiceName, voiceRate, voicePitch, voiceAutoRead,
       soundsEnabled, soundVolume, theme, keepScreenOn,
     } = req.body;
@@ -33,12 +33,14 @@ router.put('/', requireAuth, async (req, res, next) => {
       where: { userId: req.user.id },
       update: {
         notifEnabled, notifTime, notifDays, notifMessage,
+        ...(notifTimezone !== undefined && { notifTimezone }),
         voiceEnabled, voiceName, voiceRate, voicePitch, voiceAutoRead,
         soundsEnabled, soundVolume, theme, keepScreenOn,
       },
       create: {
         userId: req.user.id,
         notifEnabled, notifTime, notifDays, notifMessage,
+        notifTimezone: notifTimezone ?? 0,
         voiceEnabled, voiceName, voiceRate, voicePitch, voiceAutoRead,
         soundsEnabled, soundVolume, theme, keepScreenOn,
       },

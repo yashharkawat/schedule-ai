@@ -19,7 +19,7 @@ export default function Schedule() {
 
   if (loading && !schedule) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#eef0f9] dark:bg-[#0c0e16]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f2ff] dark:bg-[#0c0e16]">
         <div className="w-8 h-8 border-4 border-[#6366f1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -27,7 +27,7 @@ export default function Schedule() {
 
   if (!schedule) {
     return (
-      <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16] flex flex-col items-center justify-center px-5 pb-24">
+      <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16] flex flex-col items-center justify-center px-5 pb-24">
         <div className="w-16 h-16 bg-[#eef2ff] dark:bg-[#1e2040] rounded-2xl flex items-center justify-center mb-5">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -50,7 +50,7 @@ export default function Schedule() {
   }
 
   return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-5 pt-8 pb-28">
 
         {/* Header */}
@@ -85,7 +85,7 @@ export default function Schedule() {
               <div
                 key={day.id}
                 onClick={() => stepCount > 0 && navigate(`/session/${day.id}`)}
-                className={`bg-white dark:bg-[#131720] rounded-2xl border shadow-sm overflow-hidden transition-all ${
+                className={`bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none shadow-sm overflow-hidden transition-all ${
                   stepCount > 0 ? 'cursor-pointer active:scale-[0.99]' : ''
                 } ${
                   isToday

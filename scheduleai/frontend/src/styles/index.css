@@ -3,23 +3,23 @@
 * { scroll-behavior: smooth; box-sizing: border-box; }
 html { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 
-/* Light mode — warm off-white with soft tints */
+/* ── Light mode ───────────────────────────────── */
 body {
-  background: #f3f4f8;
+  background: #f0f2ff;
   color: #0f172a;
   font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Dark mode */
+/* ── Dark mode ────────────────────────────────── */
 .dark body { background: #0c0e16; color: #f1f5f9; }
 
-::selection { background: rgba(99,102,241,0.2); }
+::selection { background: rgba(99,102,241,0.25); }
 
-/* Light mode overrides for card surfaces and borders */
-:root:not(.dark) .lm-card {
-  background: #ffffff;
-  border-color: #dde1ef;
-  box-shadow: 0 1px 3px rgba(99,102,241,0.06), 0 1px 2px rgba(0,0,0,0.04);
+/* ── Light mode card elevation ────────────────── */
+/* White cards with indigo-tinted shadow instead of flat borders */
+:root:not(.dark) .lm-elevated {
+  box-shadow: 0 1px 3px rgba(99,102,241,0.08), 0 4px 16px rgba(99,102,241,0.06);
+  border-color: transparent !important;
 }

@@ -74,7 +74,7 @@ export default function ImportSchedule() {
   const activeDays = preview?.days?.filter(d => d.steps?.length > 0) || [];
 
   return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -169,7 +169,7 @@ export default function ImportSchedule() {
         {/* Preview */}
         {status === 'preview' && preview && (
           <div>
-            <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#6366f1] p-5 mb-4 shadow-sm">
+            <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#6366f1] p-5 mb-4 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <p className="text-xs font-semibold text-[#6366f1] dark:text-[#818cf8] uppercase tracking-wider mb-1">Schedule found</p>

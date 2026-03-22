@@ -75,7 +75,7 @@ export default function ScheduleEditor() {
   };
 
   return (
-    <div className="min-h-screen bg-[#eef0f9] dark:bg-[#0c0e16]">
+    <div className="min-h-screen bg-[#f0f2ff] dark:bg-[#0c0e16]">
       <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -99,11 +99,11 @@ export default function ScheduleEditor() {
         </div>
 
         {/* Schedule title + rest time */}
-        <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] p-4 mb-4 space-y-3">
+        <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] p-4 mb-4 space-y-3">
           <div>
             <label className="text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider">Schedule name</label>
             <input
-              className="mt-1 w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
+              className="mt-1 w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
               placeholder="e.g. Morning routine"
               value={title}
               onChange={e => setTitle(e.target.value)}
@@ -116,7 +116,7 @@ export default function ScheduleEditor() {
                 type="number"
                 min="0"
                 max="300"
-                className="w-24 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
+                className="w-24 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-4 py-2.5 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] transition-colors"
                 value={restSeconds}
                 onChange={e => setRestSeconds(e.target.value)}
               />
@@ -132,10 +132,10 @@ export default function ScheduleEditor() {
             const isOpen = expandedDay === di;
 
             return (
-              <div key={day._id} className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
+              <div key={day._id} className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
                 <button
                   onClick={() => setExpandedDay(isOpen ? -1 : di)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-[#eef0f9] dark:hover:bg-[#0c0e16] transition-colors"
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-[#f0f2ff] dark:hover:bg-[#0c0e16] transition-colors"
                 >
                   <div>
                     <div className="font-semibold text-[#0f172a] dark:text-[#f1f5f9]">{day.name}</div>
@@ -163,7 +163,7 @@ export default function ScheduleEditor() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-semibold text-[#94a3b8] w-6">#{si + 1}</span>
                           <input
-                            className="flex-1 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
+                            className="flex-1 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] transition-colors"
                             placeholder="Exercise name"
                             value={step.title}
                             onChange={e => updateStep(di, si, 'title', e.target.value)}
@@ -172,7 +172,7 @@ export default function ScheduleEditor() {
                             <input
                               type="number"
                               min="1"
-                              className="w-16 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-2 py-2 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] text-center transition-colors"
+                              className="w-16 border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-2 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] focus:outline-none focus:border-[#6366f1] text-center transition-colors"
                               value={step.durationMinutes}
                               onChange={e => updateStep(di, si, 'durationMinutes', e.target.value)}
                             />
@@ -190,7 +190,7 @@ export default function ScheduleEditor() {
                         </div>
                         <div className="pl-6">
                           <textarea
-                            className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#eef0f9] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] resize-none transition-colors"
+                            className="w-full border border-[#dde1ef] dark:border-[#1e2235] rounded-xl px-3 py-2 text-sm bg-[#f0f2ff] dark:bg-[#1e2235] text-[#0f172a] dark:text-[#f1f5f9] placeholder-[#94a3b8] focus:outline-none focus:border-[#6366f1] resize-none transition-colors"
                             rows={2}
                             placeholder="Description (optional)"
                             value={step.instructions}

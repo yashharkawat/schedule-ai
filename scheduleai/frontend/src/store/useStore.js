@@ -21,6 +21,7 @@ const useStore = create(
         theme: 'dark',
         keepScreenOn: true,
         keepAlive: false,
+        notifTimezone: -new Date().getTimezoneOffset(), // minutes east of UTC
       },
       log: [],
       streak: 0,
@@ -68,6 +69,7 @@ const useStore = create(
               soundVolume: s.soundVolume,
               theme: s.theme,
               keepScreenOn: s.keepScreenOn,
+              notifTimezone: s.notifTimezone ?? -new Date().getTimezoneOffset(),
             }
           });
         } catch (err) {

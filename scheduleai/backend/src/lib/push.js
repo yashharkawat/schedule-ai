@@ -49,16 +49,12 @@ export async function sendScheduledNotifications() {
   ensureVapid();
   if (!vapidConfigured) return;
 
-  const now = new Date();
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  const currentDay = dayNames[now.getDay()];
+  const nowUtc = new Date();
 
-  // Find all users with notifications enabled at this time on this day
+  // Find all users with notifications enabled
   const settings = await prisma.userSettings.findMany({
     where: {
       notifEnabled: true,
-      notifTime: currentTime,
     },
     include: {
       user: {
@@ -67,7 +63,17 @@ export async function sendScheduledNotifications() {
     },
   });
 
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
   for (const s of settings) {
+    // Convert UTC time to user's local time using their timezone offset (minutes east of UTC)
+    const tzOffset = s.notifTimezone ?? 0;
+    const localMs = nowUtc.getTime() + tzOffset * 60 * 1000;
+    const localDate = new Date(localMs);
+    const currentTime = `${String(localDate.getUTCHours()).padStart(2, '0')}:${String(localDate.getUTCMinutes()).padStart(2, '0')}`;
+    const currentDay = dayNames[localDate.getUTCDay()];
+
+    if (s.notifTime !== currentTime) continue;
     const notifDays = Array.isArray(s.notifDays) ? s.notifDays : JSON.parse(s.notifDays || '[]');
     if (!notifDays.includes(currentDay)) continue;
     if (!s.user.pushSubs.length) continue;

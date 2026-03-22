@@ -8,7 +8,7 @@ export default function StepList({ steps, currentIndex, onJump }) {
   }, [currentIndex]);
 
   return (
-    <div className="bg-white dark:bg-[#131720] rounded-2xl border border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
+    <div className="bg-white dark:bg-[#131720] rounded-2xl border shadow-[0_1px_3px_rgba(99,102,241,0.08),0_2px_8px_rgba(99,102,241,0.05)] dark:shadow-none border-[#dde1ef] dark:border-[#1e2235] overflow-hidden">
       <div className="px-4 py-3 text-xs font-semibold text-[#64748b] dark:text-[#94a3b8] uppercase tracking-wider border-b border-[#dde1ef] dark:border-[#1e2235]">
         Exercises
       </div>
@@ -23,7 +23,7 @@ export default function StepList({ steps, currentIndex, onJump }) {
             className={`flex items-center gap-3 px-4 py-3 border-b border-[#dde1ef] dark:border-[#1e2235] last:border-0 cursor-pointer transition-colors ${
               isCurrent
                 ? 'bg-[#eef2ff] dark:bg-[#1e2040] border-l-4 border-l-[#6366f1]'
-                : 'hover:bg-[#eef0f9] dark:hover:bg-[#131720]'
+                : 'hover:bg-[#f0f2ff] dark:hover:bg-[#131720]'
             } ${isDone ? 'opacity-60' : ''}`}
           >
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
