@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore.js';
+import { api } from '../lib/api.js';
 import NavBar from '../components/NavBar.jsx';
 
 function fmtTime(totalMinRaw) {
@@ -16,6 +17,9 @@ export default function Schedule() {
   const { schedule, schedules, log, streak, fetchSchedule, fetchSchedules, loading } = useStore();
   const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const [expanded, setExpanded] = useState({});
+  const [expandedDay, setExpandedDay] = useState({});
+  const [deletingSchedule, setDeletingSchedule] = useState({});
+  const [deletingStep, setDeletingStep] = useState({});
 
   useEffect(() => {
     if (schedules.length === 0 && !schedule) fetchSchedule();
@@ -27,6 +31,26 @@ export default function Schedule() {
   const todayLog = (day) => {
     const today = new Date().toISOString().split('T')[0];
     return log.find(l => l.dayId === day.id && new Date(l.completedAt).toISOString().split('T')[0] === today);
+  };
+
+  const handleDeleteSchedule = async (id) => {
+    if (!deletingSchedule[id]) {
+      setDeletingSchedule(s => ({ ...s, [id]: true }));
+      return;
+    }
+    await api.deleteSchedule(id);
+    setDeletingSchedule(s => ({ ...s, [id]: false }));
+    fetchSchedules();
+  };
+
+  const handleDeleteStep = async (stepId) => {
+    if (!deletingStep[stepId]) {
+      setDeletingStep(s => ({ ...s, [stepId]: true }));
+      return;
+    }
+    await api.deleteStep(stepId);
+    setDeletingStep(s => ({ ...s, [stepId]: false }));
+    fetchSchedules();
   };
 
   if (loading && allSchedules.length === 0) {
@@ -101,22 +125,49 @@ export default function Schedule() {
             return (
               <div key={sched.id} className="bg-[#dce8e8] dark:bg-[#1a3535]">
                 {/* Schedule header */}
-                <button
-                  onClick={() => setExpanded(e => ({ ...e, [sched.id]: !isOpen }))}
-                  className="w-full flex items-center justify-between px-4 py-4 text-left"
-                >
-                  <div>
-                    <p className="text-[#0f2828] dark:text-white font-black text-base">{sched.title}</p>
-                    <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{days.filter(d => (d.steps||[]).length > 0).length} active days · {fmtTime(totalMin)}</p>
-                  </div>
-                  <svg
-                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                    strokeLinecap="round" strokeLinejoin="round"
-                    className={`text-[#4a7272] dark:text-[#6a9090] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setExpanded(e => ({ ...e, [sched.id]: !isOpen }))}
+                    className="flex-1 flex items-center justify-between px-4 py-4 text-left"
                   >
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
-                </button>
+                    <div>
+                      <p className="text-[#0f2828] dark:text-white font-black text-base">{sched.title}</p>
+                      <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{days.filter(d => (d.steps||[]).length > 0).length} active days · {fmtTime(totalMin)}</p>
+                    </div>
+                    <svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                      strokeLinecap="round" strokeLinejoin="round"
+                      className={`text-[#4a7272] dark:text-[#6a9090] transition-transform mr-3 ${isOpen ? 'rotate-180' : ''}`}
+                    >
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </button>
+                  {deletingSchedule[sched.id] ? (
+                    <div className="flex items-center gap-1 pr-3">
+                      <button
+                        onClick={() => handleDeleteSchedule(sched.id)}
+                        className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded active:opacity-70"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => setDeletingSchedule(s => ({ ...s, [sched.id]: false }))}
+                        className="px-2 py-1 bg-[#c4d8d8] dark:bg-[#264040] text-[#4a7272] dark:text-[#6a9090] text-xs font-bold rounded active:opacity-70"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleDeleteSchedule(sched.id)}
+                      className="pr-4 py-4 text-[#8aacac] dark:text-[#4a7070] active:opacity-70"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
 
                 {/* Days */}
                 {isOpen && (
@@ -127,30 +178,76 @@ export default function Schedule() {
                       const stepCount = (day.steps || []).length;
                       const dayMin = (day.steps || []).reduce((a, s) => a + (s.durationMinutes || 0), 0);
 
+                      const isDayOpen = expandedDay[day.id];
+
                       return (
-                        <div key={day.id} className="flex items-center justify-between px-4 py-3 border-b border-[#c4d8d8] dark:border-[#264040] last:border-0">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[#0f2828] dark:text-white font-semibold text-sm ${isToday ? 'underline decoration-[#f2c029]' : ''}`}>
-                                {day.name}
-                              </span>
-                              {isToday && <span className="text-[10px] text-[#f2c029] font-bold uppercase tracking-wider">TODAY</span>}
-                              {done && <span className="text-[#f2c029] text-xs">✓</span>}
-                            </div>
-                            {stepCount > 0 && (
-                              <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{stepCount} exercise{stepCount !== 1 ? 's' : ''} · {fmtTime(dayMin)}</p>
+                        <div key={day.id} className="border-b border-[#c4d8d8] dark:border-[#264040] last:border-0">
+                          <div className="flex items-center justify-between px-4 py-3">
+                            <button
+                              onClick={() => stepCount > 0 && setExpandedDay(e => ({ ...e, [day.id]: !isDayOpen }))}
+                              className="flex-1 text-left"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[#0f2828] dark:text-white font-semibold text-sm ${isToday ? 'underline decoration-[#f2c029]' : ''}`}>
+                                  {day.name}
+                                </span>
+                                {isToday && <span className="text-[10px] text-[#f2c029] font-bold uppercase tracking-wider">TODAY</span>}
+                                {done && <span className="text-[#f2c029] text-xs">✓</span>}
+                              </div>
+                              {stepCount > 0 && (
+                                <p className="text-[#4a7272] dark:text-[#6a9090] text-xs mt-0.5">{stepCount} exercise{stepCount !== 1 ? 's' : ''} · {fmtTime(dayMin)}</p>
+                              )}
+                            </button>
+                            {stepCount > 0 ? (
+                              <button
+                                onClick={() => navigate(`/session/${day.id}`)}
+                                className="text-[#1a7070] dark:text-[#f2c029] font-bold text-sm flex items-center gap-1.5 active:opacity-70 transition-opacity"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                START
+                              </button>
+                            ) : (
+                              <span className="text-[#8aacac] dark:text-[#4a7070] text-xs">Rest</span>
                             )}
                           </div>
-                          {stepCount > 0 ? (
-                            <button
-                              onClick={() => navigate(`/session/${day.id}`)}
-                              className="text-[#1a7070] dark:text-[#f2c029] font-bold text-sm flex items-center gap-1.5 active:opacity-70 transition-opacity"
-                            >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                              START
-                            </button>
-                          ) : (
-                            <span className="text-[#8aacac] dark:text-[#4a7070] text-xs">Rest</span>
+
+                          {/* Exercises list */}
+                          {isDayOpen && stepCount > 0 && (
+                            <div className="bg-[#cfdede] dark:bg-[#152e2e] px-4 pb-2">
+                              {day.steps.map((step) => (
+                                <div key={step.id} className="flex items-center justify-between py-2 border-t border-[#b8cccc] dark:border-[#1e3535] first:border-0">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[#0f2828] dark:text-white text-sm font-medium truncate">{step.title}</p>
+                                    <p className="text-[#4a7272] dark:text-[#6a9090] text-xs">{fmtTime(step.durationMinutes)} · {step.sets || 1} set{(step.sets || 1) !== 1 ? 's' : ''}</p>
+                                  </div>
+                                  {deletingStep[step.id] ? (
+                                    <div className="flex items-center gap-1 ml-2">
+                                      <button
+                                        onClick={() => handleDeleteStep(step.id)}
+                                        className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded active:opacity-70"
+                                      >
+                                        Delete
+                                      </button>
+                                      <button
+                                        onClick={() => setDeletingStep(s => ({ ...s, [step.id]: false }))}
+                                        className="px-2 py-1 bg-[#c4d8d8] dark:bg-[#264040] text-[#4a7272] dark:text-[#6a9090] text-xs font-bold rounded active:opacity-70"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleDeleteStep(step.id)}
+                                      className="ml-3 text-[#8aacac] dark:text-[#4a7070] active:opacity-70"
+                                    >
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                       );
