@@ -38,9 +38,14 @@ export default function Schedule() {
       setDeletingSchedule(s => ({ ...s, [id]: true }));
       return;
     }
-    await api.deleteSchedule(id);
-    setDeletingSchedule(s => ({ ...s, [id]: false }));
-    fetchSchedules();
+    try {
+      await api.deleteSchedule(id);
+      setDeletingSchedule(s => ({ ...s, [id]: false }));
+      fetchSchedules();
+    } catch (err) {
+      setDeletingSchedule(s => ({ ...s, [id]: false }));
+      alert('Could not delete schedule: ' + err.message);
+    }
   };
 
   const handleDeleteStep = async (stepId) => {
@@ -48,9 +53,14 @@ export default function Schedule() {
       setDeletingStep(s => ({ ...s, [stepId]: true }));
       return;
     }
-    await api.deleteStep(stepId);
-    setDeletingStep(s => ({ ...s, [stepId]: false }));
-    fetchSchedules();
+    try {
+      await api.deleteStep(stepId);
+      setDeletingStep(s => ({ ...s, [stepId]: false }));
+      fetchSchedules();
+    } catch (err) {
+      setDeletingStep(s => ({ ...s, [stepId]: false }));
+      alert('Could not delete exercise: ' + err.message);
+    }
   };
 
   if (loading && allSchedules.length === 0) {

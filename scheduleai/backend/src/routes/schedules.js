@@ -104,9 +104,21 @@ router.put('/:id', requireAuth, async (req, res, next) => {
 // DELETE /api/schedules/:id
 router.delete('/:id', requireAuth, async (req, res, next) => {
   try {
-    await req.prisma.schedule.deleteMany({
+    // Verify ownership
+    const schedule = await req.prisma.schedule.findFirst({
       where: { id: req.params.id, userId: req.user.id },
+      include: { days: { select: { id: true } } },
     });
+    if (!schedule) return res.status(404).json({ error: 'Not found' });
+
+    const dayIds = schedule.days.map(d => d.id);
+
+    // Manually cascade: steps → session logs → days → schedule
+    await req.prisma.step.deleteMany({ where: { dayId: { in: dayIds } } });
+    await req.prisma.sessionLog.deleteMany({ where: { dayId: { in: dayIds } } });
+    await req.prisma.day.deleteMany({ where: { scheduleId: req.params.id } });
+    await req.prisma.schedule.delete({ where: { id: req.params.id } });
+
     res.json({ ok: true });
   } catch (err) {
     next(err);
