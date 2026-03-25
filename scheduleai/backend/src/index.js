@@ -17,12 +17,14 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4173',
-  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL?.replace(/\/$/, ''),
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);
+    const normalized = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalized) || normalized.endsWith('.vercel.app')) return cb(null, true);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
