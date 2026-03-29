@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './lib/auth.jsx';
 import useStore from './store/useStore.js';
 import Home from './pages/Home.jsx';
-import Schedule from './pages/Schedule.jsx';
+import ScheduleSession from './pages/ScheduleSession.jsx';
 import Session from './pages/Session.jsx';
 import Settings from './pages/Settings.jsx';
 import ScheduleEditor from './pages/ScheduleEditor.jsx';
@@ -42,15 +42,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!settings.keepAlive) return;
-    const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const id = setInterval(() => {
-      fetch(`${BASE}/health`).catch(() => {});
-    }, 8 * 60 * 1000);
-    return () => clearInterval(id);
-  }, [settings.keepAlive]);
-
-  useEffect(() => {
     const apply = (theme) => {
       if (theme === 'auto') {
         document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -69,15 +60,16 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#f0f5f5] dark:bg-[#0e2020] text-[#0f2828] dark:text-white">
+      <div className="min-h-screen bg-[#f4f1eb] dark:bg-[#1a1714] text-[#2c2a24] dark:text-[#e8e3d8]">
         <Routes>
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/" element={<AuthGuard><Home /></AuthGuard>} />
-          <Route path="/schedule" element={<AuthGuard><Schedule /></AuthGuard>} />
+          <Route path="/play/:scheduleId" element={<AuthGuard><ScheduleSession /></AuthGuard>} />
+          <Route path="/session/:dayId" element={<AuthGuard><Session /></AuthGuard>} />
+          <Route path="/schedule" element={<Navigate to="/" replace />} />
           <Route path="/schedule/new" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />
           <Route path="/schedule/import" element={<AuthGuard><ImportSchedule /></AuthGuard>} />
           <Route path="/schedule/edit/:scheduleId" element={<AuthGuard><ScheduleEditor /></AuthGuard>} />
-          <Route path="/session/:dayId" element={<AuthGuard><Session /></AuthGuard>} />
           <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
           <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
         </Routes>
